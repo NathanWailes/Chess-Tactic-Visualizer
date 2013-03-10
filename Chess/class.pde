@@ -14,6 +14,11 @@ class Game {
   color white_player_color = color(0, 0, 150);
   color black_player_color = color(150, 0, 0);
   
+  //the below variables are used to make a square glow
+  color dest_color = color(255, 255, 0);
+  float glow_color = 255;
+  float increment = 9;
+  
   void ProcessSquareClick() {
     Square[] Squares = Board.Squares; //making a shorter name for Board.Squares
     for (int i=0; i < Squares.length; i++) {
@@ -106,7 +111,8 @@ class Square {
   int[] board_location = new int[] {0, 0};
   //screen_location holds the pixel coordinates for drawing the square
   float[] screen_location = new float[] {0, 0};
-  color square_color;
+  color default_square_color;
+  color current_square_color;
   Piece occupying_piece; //i may end up not using this
   boolean hovered_over; //tracks whether the mouse is hovering over the square
   boolean selected = false;
@@ -114,11 +120,12 @@ class Square {
                               //glow brighter and darker.
   
   Square(String _name, int[] _board_location,
-         float[] _screen_location, color _square_color ) {
+         float[] _screen_location, color _default_square_color ) {
     name = _name;
     board_location = _board_location;
     screen_location = _screen_location;
-    square_color = _square_color;
+    default_square_color = _default_square_color;
+    current_square_color = default_square_color;
     //the loop below checks to see if any pieces are on the square.
     Piece[] Pieces = Chess.Pieces;
     for (int p = 0; p < Pieces.length; p++) {

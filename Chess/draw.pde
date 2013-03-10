@@ -13,7 +13,7 @@ void DrawChessboard() {
       fill(GlowColor());
       //fill(Chess.Board.square_selected_color);
     } else {
-      fill(Squares[i].square_color);
+      fill(Squares[i].current_square_color);
     }
     if (Squares[i].hovered_over == true) {
       stroke(255, 0, 0);
@@ -31,13 +31,13 @@ void DrawChessboard() {
 //glow, and have them glow at different rates based on information about that
 //square (eg a piece in danger glows quickly).
 color GlowColor() {
-  glow_color = glow_color + increment;
-  if (glow_color > 255 || glow_color < 0) {
-    increment = increment * -1;
+  Chess.glow_color = Chess.glow_color + Chess.increment;
+  if (Chess.glow_color > 255 || Chess.glow_color < 0) {
+    Chess.increment = Chess.increment * -1;
   }
   int green = 0;
   int blue = 0;
-  return color(glow_color, glow_color, blue);
+  return color(Chess.glow_color, Chess.glow_color, blue);
 }
 
 void DrawPieces() {

@@ -1,9 +1,5 @@
 //*********************THIS LINE IS 80 CHARACTERS LONG**************************
 
-//I want to get these variables to not be global ASAP
-float glow_color = 255;
-float increment = 9;
-
 PImage img;
 
 //I need global screen_width/height vars b/c the Board class uses the width and

@@ -49,7 +49,7 @@ void InitializeSquares () {
   Chess.Board.Squares = new Square[64];
   float square_x;
   float square_y;
-  color square_color;
+  color default_square_color;
   String name;
   int index_num;
   int[] board_location;
@@ -71,21 +71,21 @@ void InitializeSquares () {
       //determining the square's color
       if (row % 2 == 0) {
         if (col % 2 == 0) {
-          square_color = Chess.Board.white_square_color;
+          default_square_color = Chess.Board.white_square_color;
         } else {
-          square_color = Chess.Board.black_square_color;
+          default_square_color = Chess.Board.black_square_color;
         }
       } else {
         if (col % 2 == 0) {
-          square_color = Chess.Board.black_square_color;
+          default_square_color = Chess.Board.black_square_color;
         } else {
-          square_color = Chess.Board.white_square_color;
+          default_square_color = Chess.Board.white_square_color;
         }
       }
       //after gathering all the necessary info, we can now initialize the square
       Chess.Board.Squares[index_num] = new Square(name, board_location, 
                                                   screen_location,
-                                                  square_color);
+                                                  default_square_color);
     } //end of the column loop
   } //end of the row loop
   
