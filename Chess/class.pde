@@ -14,10 +14,9 @@ class Game {
   color white_player_color = color(0, 0, 150);
   color black_player_color = color(150, 0, 0);
   
-  //the below variables are used to make a square glow
-  color dest_color = color(255, 255, 0);
-  float glow_color = 255;
-  float increment = 9;
+  //the below variables are used to make a square glow with alternateColors()
+  color glow_color = color(243, 255, 0);
+  int glow_period_in_seconds = 2;
   
   void ProcessSquareClick() {
     Square[] Squares = Board.Squares; //making a shorter name for Board.Squares

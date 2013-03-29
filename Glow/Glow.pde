@@ -1,57 +1,66 @@
 color dest_color = color(243, 255, 0);
 color start_color = color(0, 110, 0);
-float glow_period_in_seconds = 3;
-int frame_counter = 1;
+int glow_period_in_seconds = 3;
+int target_frameRate = 60;
 
 void setup() {
 size(640, 360);
 background(0);
 noStroke();
-frameRate(60);
-
+frameRate(target_frameRate);
 }
 
 void draw() {
   
-background(colorSwitcher(start_color, dest_color));
+background(alternateColors(start_color, dest_color, glow_period_in_seconds, 
+           target_frameRate));
 }
 //*********************THIS LINE IS 80 CHARACTERS LONG**************************
-color colorSwitcher(color _start_color, color _dest_color) {
+color alternateColors(color _start_color, color _dest_color, 
+                      int _period_in_seconds,
+                      int _target_frameRate) {
   color start_color = _start_color;
   color dest_color = _dest_color;
   
-  float red_delta = red(dest_color) - red(start_color);
-  float green_delta = green(dest_color) - green(start_color);
-  float blue_delta = blue(dest_color) - blue(start_color);
-  
   //calculate how many frames a complete cycle of glowing will take, going
   //all the way from the start_color to the dest_color and then back.
-  float glow_frame_period = frameRate * glow_period_in_seconds;
+  //I can't use the system variable frameRate because it may change if the comp
+  //can't calculate fast enough to hit the target framerate.
+  float glow_period_in_frames = int(_target_frameRate * _period_in_seconds);
+  float current_position_in_the_period = frameCount % glow_period_in_frames;
+
+  //calculate the total distance we need to travel from one color to the other
+  int total_red_change = int(red(dest_color)) - int(red(start_color));
+  int total_green_change = int(green(dest_color)) - int(green(start_color));
+  int total_blue_change = int(blue(dest_color)) - int(blue(start_color));
   
-  //calculate how much each color channel needs to change THIS frame.  This
-  //doesn't figure out if we need to add or subtract this amount from the
-  //current color; I leave that 'til later.
-  float red_change = red_delta / glow_frame_period;
-  float green_change = green_delta / glow_frame_period;
-  float blue_change = blue_delta / glow_frame_period;
+  //calculate how much each color channel needs to be adjusted from the
+  //starting color.
+  float red_adjustment;
+  float green_adjustment;
+  float blue_adjustment;
+  if (current_position_in_the_period < (glow_period_in_frames / 2)) {
+    red_adjustment = total_red_change * (current_position_in_the_period /
+                        glow_period_in_frames) * 2;
+    green_adjustment = total_green_change * (current_position_in_the_period /
+                        glow_period_in_frames) * 2;
+    blue_adjustment = total_blue_change * (current_position_in_the_period /
+                        glow_period_in_frames) * 2;
+  } else {
+    red_adjustment = total_red_change * ((-2 * (current_position_in_the_period /
+                        glow_period_in_frames)) + 2);
+    green_adjustment = total_green_change * ((-2 * (current_position_in_the_period /
+                        glow_period_in_frames)) + 2);
+    blue_adjustment = total_blue_change * ((-2 * (current_position_in_the_period /
+                        glow_period_in_frames)) + 2);
+  }
   
   //to make sure I make the right decision about adding or subracting the nec.
   //change in value, I need to check whether I am [currently moving from the
   //starting color to the destination color] or if it's vice versa.
-  red_change = (frame_counter < (glow_frame_period / 2)) ? red_change : 
-                                                      -1 * red_change;
-  green_change = (frame_counter < (glow_frame_period / 2)) ? green_change : 
-                                                      -1 * green_change;
-  blue_change = (frame_counter < (glow_frame_period / 2)) ? blue_change : 
-                                                      -1 * blue_change;
-  
-  float new_red = red(start_color) + (frame_counter * red_change);
-  float new_green = green(start_color) + (frame_counter * green_change);
-  float new_blue = blue(start_color) + (frame_counter * blue_change);
-  
-  //increment the frame_counter
-  frame_counter = (frame_counter < (glow_frame_period / 2)) ? frame_counter += 1 : 1;
-  if (frame_counter % 10 == 0) { print(str(red_change) + "\n"); }
-  
+  float new_red = red(start_color) + (red_adjustment);
+  float new_green = green(start_color) + (green_adjustment);
+  float new_blue = blue(start_color) + (blue_adjustment);
+
   return color(new_red, new_green, new_blue);
 }

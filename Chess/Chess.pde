@@ -12,9 +12,13 @@ int screen_height = 360;
 //the setup() and draw() functions.
 Game Chess = new Game();
 
+//I need this global variable for alternateColors() to have glowing happen over
+//a constant amount of time even if I decide to change the framerate later.
+int target_frameRate = 30;
+
 void setup() {
   size(screen_width, screen_height);
-  frameRate(30);
+  frameRate(target_frameRate);
   PFont f = loadFont("Arial-BoldMT-10.vlw");
   textFont(f,16);
   
