@@ -44,6 +44,32 @@ class Game {
     }
   } //end of ProcessSquareClick()
 
+
+  boolean LegalPawnMove() {
+    return true;
+  }
+
+  boolean LegalKnightMove() {
+    return true;
+  }
+
+  boolean LegalBishopMove() {
+    return true;
+  }
+
+  boolean LegalRookMove() {
+    return true;
+  }
+
+  boolean LegalQueenMove() {
+    return true;
+  }
+
+  boolean LegalKingMove() {
+    return true;
+  }
+
+
 } //end of the Game class
 
 //if the player is playing 3D/4D chess there will be multiple boards, each with
@@ -92,11 +118,27 @@ class Piece {
   }
   
   boolean MoveAllowed(Square destination_square) {
-    //I need to fill this out.
-    return true;
+    //I need to check:
+    // 1) does the player have another piece there already?
+    // 2) if not, can that piece legally move to that square?
+    if (destination_square.occupying_piece.side == this.side) {
+      return false;
+    } else if (this.type == 'P') {
+      return Chess.LegalPawnMove() ? true : false;
+    } else if (this.type == 'N') {
+      return Chess.LegalKnightMove() ? true : false;
+    } else if (this.type == 'B') {
+      return Chess.LegalBishopMove() ? true : false;
+    } else if (this.type == 'R') {
+      return Chess.LegalRookMove() ? true : false;
+    } else if (this.type == 'Q') {
+      return Chess.LegalQueenMove() ? true : false;
+    } else if (this.type == 'K') {
+      return Chess.LegalKingMove() ? true : false;
+    }
+    return false;
   }
   
-    
   void Move(int destination_square_index) {
     int i = destination_square_index; //renaming it to be shorter
     
