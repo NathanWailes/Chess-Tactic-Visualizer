@@ -22,8 +22,9 @@ class Game {
     Square[] Squares = Board.Squares; //making a shorter name for Board.Squares
     for (int i=0; i < Squares.length; i++) {
       float square_side = Board.square_side;
-      if ( overRect(Squares[i].screen_location[0], Squares[i].screen_location[1],
-           square_side, square_side) ) {
+      if ( overRect(Squares[i].screen_location[0],
+                    Squares[i].screen_location[1],
+                    square_side, square_side) ) {
         //deselect the square if it was already selected
         if (Squares[i].selected == true) {
           Board.Squares[i].selected = false;
@@ -34,54 +35,28 @@ class Game {
           selected_square = Squares[i];
           Squares[i].selected = true;
         //if a piece is selected already, move it to the current square
-        } else if ((selected_square.occupying_piece != null_piece) && 
-                   (MoveAllowed(i))) {
-          MovePiece(i);
+        } else if ((selected_square.occupying_piece != null_piece) /*&& 
+                   (Squares[i].occupying_piece.MoveAllowed(Squares[i]))*/
+                   ) {
+          selected_square.occupying_piece.Move(i);
         }
       }
     }
   } //end of ProcessSquareClick()
-  
-  boolean MoveAllowed(int destination_square_index) {
-    //I need to fill this out.
-    return true;
-  }
-  
-  void MovePiece(int destination_square_index) {
-    int i = destination_square_index; //renaming it to be shorter
-    Square destination_square = Board.Squares[i];
-    if (destination_square.occupying_piece == null_piece) {
-      //I need to find a better way to set one array equal to another...(below)
-      selected_square.occupying_piece.location[0] = 
-                                           destination_square.board_location[0];
-      selected_square.occupying_piece.location[1] = 
-                                           destination_square.board_location[1];
-      destination_square.occupying_piece = selected_square.occupying_piece;
-      selected_square.occupying_piece = null_piece;
-    //if there's an opponent's piece there already, then
-      //remove the opponent's piece, set it to "captured"
-      //move the selected piece to that square
-    } else {
-      
-    }
-    //deselect the selected square automatically\
-    selected_square.selected = false;
-    Square null_square = Chess.null_square;
-    selected_square = null_square;
-  } // end of MovePiece()
 
 } //end of the Game class
 
 //if the player is playing 3D/4D chess there will be multiple boards, each with
 //their own x and y coordinates.
 class Board {
-  int board_x;
-  int board_y;
-  float board_width = 300;
-  float board_height = 300;
+  int board_x, board_y;
+  float board_width = 300, board_height = 300;
   float square_side = board_width / 8;
   Square[] Squares;
   
+  //if I make 3D / 4D chess I may want
+  //to have different boards be different colors to reflect their different
+  //dimensions
   color black_square_color = color(0, 110, 0);
   color white_square_color = color(255, 255, 255);
   color square_selected_color = color(243, 255, 0);
@@ -97,13 +72,58 @@ class Piece {
   char side = 'W'; //white or black piece
   char type = 'P'; //every piece has a type (eg pawn, queen)
   int[] location = new int[] {0, 0}; //every piece has a location (eg h4, g7)
+  Square[] possible_moves;
   
   Piece(char _side, char _type, int[] _location) {
     side = _side;
     type = _type;
     location = _location;
   }
-}
+  
+  Square[] get_possible_moves(Square[] all_squares) {
+    Square[] possible_moves = {};
+    for (int i=0; i < all_squares.length; ++i) {
+      //the "this" below refers to the piece that is running this method
+      if (this.MoveAllowed(all_squares[i])) {
+        append(possible_moves, all_squares[i]);
+      }
+    }
+    return possible_moves;
+  }
+  
+  boolean MoveAllowed(Square destination_square) {
+    //I need to fill this out.
+    return true;
+  }
+  
+    
+  void Move(int destination_square_index) {
+    int i = destination_square_index; //renaming it to be shorter
+    
+    //I think these are making copies of the objects...I'm not sure though.
+    Square destination_square = Chess.Board.Squares[i];
+    Square selected_square = Chess.selected_square;
+    Piece null_piece = Chess.null_piece;
+    
+    if (destination_square.occupying_piece == null_piece) {
+      selected_square.occupying_piece.location = 
+                                              destination_square.board_location;
+      destination_square.occupying_piece = selected_square.occupying_piece;
+      selected_square.occupying_piece = null_piece;
+    //if there's an opponent's piece there already, then
+      //remove the opponent's piece, set it to "captured"
+      //move the selected piece to that square
+    } else {
+      
+    }
+    //deselect the selected square automatically
+    Chess.selected_square.selected = false;
+    Square null_square = Chess.null_square;
+    Chess.selected_square = null_square;
+  } // end of Move()
+
+}//end of class Piece
+
 class Square {
   String name; //the name of the square (eg h4, g7)
   //board_location is used for calculating moves of pieces; range: 0,0 to 8,8

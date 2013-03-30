@@ -32,17 +32,14 @@ void DrawChessboard() {
 //darker to make the board more attractive.  Maybe I could make many squares
 //glow, and have them glow at different rates based on information about that
 //square (eg a piece in danger glows quickly).
-color alternateColors(color _start_color, color _dest_color, 
-                      int _period_in_seconds,
-                      int _target_frameRate) {
-  color start_color = _start_color;
-  color dest_color = _dest_color;
-  
+color alternateColors(color start_color, color dest_color, 
+                      int period_in_seconds,
+                      int target_frameRate) {
   //calculate how many frames a complete cycle of glowing will take, going
   //all the way from the start_color to the dest_color and then back.
   //I can't use the system variable frameRate because it may change if the comp
   //can't calculate fast enough to hit the target framerate.
-  float glow_period_in_frames = int(_target_frameRate * _period_in_seconds);
+  float glow_period_in_frames = int(target_frameRate * period_in_seconds);
   float current_position_in_the_period = frameCount % glow_period_in_frames;
 
   //calculate the total distance we need to travel from one color to the other
@@ -56,19 +53,21 @@ color alternateColors(color _start_color, color _dest_color,
   float green_adjustment;
   float blue_adjustment;
   if (current_position_in_the_period < (glow_period_in_frames / 2)) {
-    red_adjustment = total_red_change * (current_position_in_the_period /
-                        glow_period_in_frames) * 2;
-    green_adjustment = total_green_change * (current_position_in_the_period /
-                        glow_period_in_frames) * 2;
-    blue_adjustment = total_blue_change * (current_position_in_the_period /
-                        glow_period_in_frames) * 2;
+    float fraction_complete = current_position_in_the_period /
+                                  glow_period_in_frames;
+    float first_half_adjustment = fraction_complete * 2;
+    
+    red_adjustment = total_red_change * first_half_adjustment;
+    green_adjustment = total_green_change * first_half_adjustment;
+    blue_adjustment = total_blue_change * first_half_adjustment;
   } else {
-    red_adjustment = total_red_change * ((-2 * (current_position_in_the_period /
-                        glow_period_in_frames)) + 2);
-    green_adjustment = total_green_change * ((-2 * (current_position_in_the_period /
-                        glow_period_in_frames)) + 2);
-    blue_adjustment = total_blue_change * ((-2 * (current_position_in_the_period /
-                        glow_period_in_frames)) + 2);
+    float fraction_complete = current_position_in_the_period /
+                                  glow_period_in_frames;
+    float second_half_adjustment = ((-2 * fraction_complete) + 2);
+    
+    red_adjustment = total_red_change * second_half_adjustment;
+    green_adjustment = total_green_change * second_half_adjustment;
+    blue_adjustment = total_blue_change * second_half_adjustment;
   }
   
   //to make sure I make the right decision about adding or subracting the nec.
