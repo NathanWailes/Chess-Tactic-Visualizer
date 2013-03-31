@@ -44,36 +44,115 @@ class Game {
     }
   } //end of ProcessSquareClick()
 
+  //return the square's index in the array given its board_location
+  int GetSquare(int[] board_location) {
+    int desired_square_index = 0;
+    for (int i=0; i<Chess.Board.Squares.length; ++i) {
+      
+      if ((Chess.Board.Squares[i].board_location[0] == board_location[0]) &&
+         (Chess.Board.Squares[i].board_location[1] == board_location[1])) {
+           desired_square_index = i;
+      }
+    }
+    return desired_square_index;
+  }
 
   boolean LegalPawnMove(Piece moving_piece, Square destination_square, 
                         Piece[] Pieces) {
-    return true;
+    int piece_x = moving_piece.board_location[0];
+    int piece_y = moving_piece.board_location[1];
+    int square_x = destination_square.board_location[0];
+    int square_y = destination_square.board_location[1];
+    
+    if ((abs(piece_x - square_x) == 0) && (abs(piece_y - square_y) == 1)){
+      return true;
+    } else {
+      return false;
+    }
   }
 
   boolean LegalKnightMove(Piece moving_piece, Square destination_square, 
                         Piece[] Pieces) {
-    return true;
+    int piece_x = moving_piece.board_location[0];
+    int piece_y = moving_piece.board_location[1];
+    int square_x = destination_square.board_location[0];
+    int square_y = destination_square.board_location[1];
+    
+    if (((abs(piece_x - square_x) == 2) && (abs(piece_y - square_y) == 1)) ||
+        ((abs(piece_y - square_y) == 2) && (abs(piece_x - square_x) == 1))){
+      return true;
+    } else {
+      return false;
+    }
   }
 
   boolean LegalBishopMove(Piece moving_piece, Square destination_square, 
                         Piece[] Pieces) {
-    return true;
+    int piece_x = moving_piece.board_location[0];
+    int piece_y = moving_piece.board_location[1];
+    int square_x = destination_square.board_location[0];
+    int square_y = destination_square.board_location[1];
+    
+    if (abs(piece_x - square_x) == abs(piece_y - square_y)) {
+      return true;
+    } else {
+      return false;
+    }
   }
-
+    
+    /*
+    //if the piece is on the same file as its destination square:
+    if (abs(piece_x - square_x) == 0) {
+      //go square-by-square from the queen's pos to the dest square to look for
+      //other pieces
+      
+      //if the square is closer to white's side than the queen...
+      
+      int i = 1;
+      while (i <= abs(piece_x - square_x)) {
+        int interm_square_index = GetSquare(new int[] {piece_x,piece_y + i});
+        int s = interm_square_index;//a nickname b/c it's shorter
+        Square[] squares = Chess.Board.Squares;
+        
+        if (squares[s].occupying_piece != Chess.null_piece) {
+          print(squares[s].name);
+          return false;
+        }
+        i = (square_y > piece_y) ? i+1 : i-1;
+      }
+      
+      return false;
+    } else {
+      return true;
+    }*/
   boolean LegalRookMove(Piece moving_piece, Square destination_square, 
                         Piece[] Pieces) {
-    return true;
+    int piece_x = moving_piece.board_location[0];
+    int piece_y = moving_piece.board_location[1];
+    int square_x = destination_square.board_location[0];
+    int square_y = destination_square.board_location[1];
+    
+    if (abs(piece_x - square_x) == 0) {
+      return true;
+    } else if (abs(piece_y - square_y) == 0) {
+      return true;
+    } else {
+      return false;
+    }
   }
 
   boolean LegalQueenMove(Piece moving_piece, Square destination_square, 
                         Piece[] Pieces) {
-    return true;
+    if (LegalBishopMove(moving_piece, destination_square, Pieces) ||
+        LegalRookMove(moving_piece, destination_square, Pieces)) {
+      return true;
+    } else {
+      return false;
+    }
   }
 
   boolean LegalKingMove(Piece moving_piece, Square destination_square, 
                         Piece[] Pieces) {
-    //so...I need to get the moving piece's pos and then check the squares
-    //around it to see if the destination_square is any of them
     int piece_x = moving_piece.board_location[0];
     int piece_y = moving_piece.board_location[1];
     int square_x = destination_square.board_location[0];
