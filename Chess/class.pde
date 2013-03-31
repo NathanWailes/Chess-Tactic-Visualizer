@@ -6,7 +6,7 @@ class Game {
   
   Square selected_square;
   Square null_square;
-  Piece null_piece;
+  Piece null_piece = new Piece('N', 'N', new int[]{-1, -1});
   
   // an array of type Piece; the array's named Pieces
   Piece[] Pieces;
@@ -45,28 +45,45 @@ class Game {
   } //end of ProcessSquareClick()
 
 
-  boolean LegalPawnMove() {
+  boolean LegalPawnMove(Piece moving_piece, Square destination_square, 
+                        Piece[] Pieces) {
     return true;
   }
 
-  boolean LegalKnightMove() {
+  boolean LegalKnightMove(Piece moving_piece, Square destination_square, 
+                        Piece[] Pieces) {
     return true;
   }
 
-  boolean LegalBishopMove() {
+  boolean LegalBishopMove(Piece moving_piece, Square destination_square, 
+                        Piece[] Pieces) {
     return true;
   }
 
-  boolean LegalRookMove() {
+  boolean LegalRookMove(Piece moving_piece, Square destination_square, 
+                        Piece[] Pieces) {
     return true;
   }
 
-  boolean LegalQueenMove() {
+  boolean LegalQueenMove(Piece moving_piece, Square destination_square, 
+                        Piece[] Pieces) {
     return true;
   }
 
-  boolean LegalKingMove() {
-    return true;
+  boolean LegalKingMove(Piece moving_piece, Square destination_square, 
+                        Piece[] Pieces) {
+    //so...I need to get the moving piece's pos and then check the squares
+    //around it to see if the destination_square is any of them
+    int piece_x = moving_piece.board_location[0];
+    int piece_y = moving_piece.board_location[1];
+    int square_x = destination_square.board_location[0];
+    int square_y = destination_square.board_location[1];
+    
+    if ((abs(piece_x - square_x) <= 1) && (abs(piece_y - square_y) <= 1)) {
+      return true;
+    } else {
+      return false;
+    }
   }
 
 
@@ -97,13 +114,13 @@ class Board {
 class Piece {
   char side = 'W'; //white or black piece
   char type = 'P'; //every piece has a type (eg pawn, queen)
-  int[] location = new int[] {0, 0}; //every piece has a location (eg h4, g7)
+  int[] board_location = new int[] {0, 0}; // (eg h4, g7)
   Square[] possible_moves;
   
-  Piece(char _side, char _type, int[] _location) {
+  Piece(char _side, char _type, int[] _board_location) {
     side = _side;
     type = _type;
-    location = _location;
+    board_location = _board_location;
   }
   
   Square[] get_possible_moves(Square[] all_squares) {
@@ -121,21 +138,43 @@ class Piece {
     //I need to check:
     // 1) does the player have another piece there already?
     // 2) if not, can that piece legally move to that square?
+    
+    //figure out what piece is at the destination
+    Piece occupying_piece;
+    for (int i=0; i<Chess.Pieces.length; ++i) {
+      int piece_x = Chess.Pieces[i].board_location[0];
+      int piece_y = Chess.Pieces[i].board_location[1];
+      int square_x = destination_square.board_location[0];
+      int square_y = destination_square.board_location[1];
+      
+      if (piece_x == square_x && piece_y == square_y) {
+        occupying_piece = Chess.Pieces[i];
+      }
+    }
+    
+    
     if (destination_square.occupying_piece.side == this.side) {
       return false;
     } else if (this.type == 'P') {
-      return Chess.LegalPawnMove() ? true : false;
+      return Chess.LegalPawnMove(this, destination_square, Chess.Pieces)
+             ? true : false;
     } else if (this.type == 'N') {
-      return Chess.LegalKnightMove() ? true : false;
+      return Chess.LegalKnightMove(this, destination_square, Chess.Pieces)
+             ? true : false;
     } else if (this.type == 'B') {
-      return Chess.LegalBishopMove() ? true : false;
+      return Chess.LegalBishopMove(this, destination_square, Chess.Pieces)
+             ? true : false;
     } else if (this.type == 'R') {
-      return Chess.LegalRookMove() ? true : false;
+      return Chess.LegalRookMove(this, destination_square, Chess.Pieces)
+             ? true : false;
     } else if (this.type == 'Q') {
-      return Chess.LegalQueenMove() ? true : false;
+      return Chess.LegalQueenMove(this, destination_square, Chess.Pieces)
+             ? true : false;
     } else if (this.type == 'K') {
-      return Chess.LegalKingMove() ? true : false;
+      return Chess.LegalKingMove(this, destination_square, Chess.Pieces)
+             ? true : false;
     }
+    
     return false;
   }
   
@@ -147,8 +186,9 @@ class Piece {
     Square selected_square = Chess.selected_square;
     Piece null_piece = Chess.null_piece;
     
-    if (destination_square.occupying_piece == null_piece) {
-      selected_square.occupying_piece.location = 
+    if ((destination_square.occupying_piece == null_piece) &&
+       this.MoveAllowed(destination_square)) {
+      selected_square.occupying_piece.board_location = 
                                               destination_square.board_location;
       destination_square.occupying_piece = selected_square.occupying_piece;
       selected_square.occupying_piece = null_piece;
@@ -174,7 +214,7 @@ class Square {
   float[] screen_location = new float[] {0, 0};
   color default_square_color;
   color current_square_color;
-  Piece occupying_piece; //i may end up not using this
+  Piece occupying_piece = Chess.null_piece; //i may end up not using this
   boolean hovered_over; //tracks whether the mouse is hovering over the square
   boolean selected = false;
   int glow_loop_progress = 1; //an int from 1 to 100 used to make the square
@@ -190,8 +230,8 @@ class Square {
     //the loop below checks to see if any pieces are on the square.
     Piece[] Pieces = Chess.Pieces;
     for (int p = 0; p < Pieces.length; p++) {
-      if ((Pieces[p].location[0] == board_location[0]) &&
-          (Pieces[p].location[1] == board_location[1])) {
+      if ((Pieces[p].board_location[0] == board_location[0]) &&
+          (Pieces[p].board_location[1] == board_location[1])) {
             occupying_piece = Pieces[p];
       }
     }

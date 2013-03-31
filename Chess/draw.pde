@@ -92,12 +92,12 @@ void DrawPieces() {
     float board_x = Chess.Board.board_x;
     float board_width = Chess.Board.board_width;
     float square_side = Chess.Board.square_side;
-    float piece_x = board_x + ((board_width / 8) * (i.location[0])) + 
+    float piece_x = board_x + ((board_width / 8) * (i.board_location[0])) + 
           (square_side / 3);
     //print(width*0.25);
     float board_y = Chess.Board.board_y;
     float board_height = Chess.Board.board_height;
-    float piece_y = board_y + ((board_height / 8) * (i.location[1] + 1)) -
+    float piece_y = board_y + ((board_height / 8) * (i.board_location[1] + 1)) -
           (square_side / 3);
     ellipse(piece_x + 7,piece_y - 5, 20, 20);
     fill(0,0,0);

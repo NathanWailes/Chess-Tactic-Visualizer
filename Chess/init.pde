@@ -6,6 +6,10 @@ void InitializePieces () {
   //set up which pieces are on the board and where they are
   Chess.Pieces = new Piece[32];
   Piece[] Pieces = Chess.Pieces;
+  
+  //Piece null_piece = new Piece('N', 'N', new int[]{-1, -1});
+  //Chess.null_piece = null_piece;
+  
   Pieces[0] = new Piece('B', 'P', new int[]{0, 1});
   Pieces[1] = new Piece('B', 'P', new int[]{1, 1});
   Pieces[2] = new Piece('B', 'P', new int[]{2, 1});
@@ -41,8 +45,6 @@ void InitializePieces () {
   Pieces[29] = new Piece('W', 'B', new int[]{5, 7});
   Pieces[30] = new Piece('W', 'N', new int[]{6, 7});
   Pieces[31] = new Piece('W', 'R', new int[]{7, 7});
-  
-  Piece null_piece = new Piece('N', 'N', new int[]{-1, -1});
 } //end of InitializePieces()  
 
 void InitializeSquares () {
@@ -94,8 +96,8 @@ void InitializeSquares () {
   for (int p = 0; p < Pieces.length; p++) {
     Square[] Squares = Chess.Board.Squares;
     for (int s = 0; s < Squares.length; s++) {
-      if (Pieces[p].location[0] == Squares[s].board_location[0] &&
-          Pieces[p].location[1] == Squares[s].board_location[1]) {
+      if (Pieces[p].board_location[0] == Squares[s].board_location[0] &&
+          Pieces[p].board_location[1] == Squares[s].board_location[1]) {
             Squares[s].occupying_piece = Pieces[p];
           }
     }
