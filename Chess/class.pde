@@ -1,8 +1,8 @@
 //I'm thinking I'll have a "game" class that will have one or more boards
 //depending on whether the player is playing regular chess, 3D chess, or 4D
 //chess.  I want to have an option for the player to switch game type.
-class Game {
-  Board Board = new Board();
+class ChessGame {
+  Board[] Boards;
   
   Square selected_square;
   Square null_square;
@@ -18,16 +18,30 @@ class Game {
   color glow_color = color(243, 255, 0);
   int glow_period_in_seconds = 2;
   
+  void New2DGame(){
+   ChessGame Chess = new ChessGame("2D Chess");
+   InitializePieces();
+   InitializeSquares();
+   return;
+  }
+  
+  ChessGame(String GameType){
+    if (GameType == "2D Chess") {
+      Boards = new Board[1];
+      Boards[0] = new Board("2D Chess");
+    }
+  }
+
   void ProcessSquareClick() {
-    Square[] Squares = Board.Squares; //making a shorter name for Board.Squares
+    Square[] Squares = Boards[0].Squares; //making a shorter name for Boards[0].Squares
     for (int i=0; i < Squares.length; i++) {
-      float square_side = Board.square_side;
+      float square_side = Boards[0].square_side;
       if ( overRect(Squares[i].screen_location[0],
                     Squares[i].screen_location[1],
                     square_side, square_side) ) {
         //deselect the square if it was already selected
         if (Squares[i].selected == true) {
-          Board.Squares[i].selected = false;
+          Boards[0].Squares[i].selected = false;
           selected_square = null_square;
         //select the square if it wasn't selected
         } else if ((selected_square == null_square) &&
@@ -47,10 +61,10 @@ class Game {
   //return the square's index in the array given its board_location
   int GetSquare(int[] board_location) {
     int desired_square_index = 0;
-    for (int i=0; i<Chess.Board.Squares.length; ++i) {
+    for (int i=0; i<Chess.Boards[0].Squares.length; ++i) {
       
-      if ((Chess.Board.Squares[i].board_location[0] == board_location[0]) &&
-         (Chess.Board.Squares[i].board_location[1] == board_location[1])) {
+      if ((Chess.Boards[0].Squares[i].board_location[0] == board_location[0]) &&
+         (Chess.Boards[0].Squares[i].board_location[1] == board_location[1])) {
            desired_square_index = i;
       }
     }
@@ -112,7 +126,7 @@ class Game {
       while (i <= abs(piece_x - square_x)) {
         int interm_square_index = GetSquare(new int[] {piece_x,piece_y + i});
         int s = interm_square_index;//a nickname b/c it's shorter
-        Square[] squares = Chess.Board.Squares;
+        Square[] squares = Chess.Boards[0].Squares;
         
         if (squares[s].occupying_piece != Chess.null_piece) {
           print(squares[s].name);
@@ -164,29 +178,38 @@ class Game {
       return false;
     }
   }
-
-
-} //end of the Game class
+} //end of the ChessGame class
 
 //if the player is playing 3D/4D chess there will be multiple boards, each with
 //their own x and y coordinates.
 class Board {
   int board_x, board_y;
-  float board_width = 300, board_height = 300;
-  float square_side = board_width / 8;
+  float board_side;
+  float square_side;
+  color black_square_color;
+  color white_square_color;
+  color square_selected_color;
   Square[] Squares;
   
-  //if I make 3D / 4D chess I may want
-  //to have different boards be different colors to reflect their different
-  //dimensions
-  color black_square_color = color(0, 110, 0);
-  color white_square_color = color(255, 255, 255);
-  color square_selected_color = color(243, 255, 0);
-  color square_border_color = color(0, 0, 0);
-  
-  Board() {
-    board_x = int(screen_width * 0.25);
-    board_y = int(screen_height * 0.1);
+  Board(String GameType) {
+    if (GameType == "2D Chess") {
+      board_side = 500;
+      board_x = int((screen_width/2) - (board_side/2));
+      board_y = int(screen_height / 10);
+      square_side = board_side / 8;
+      black_square_color = color(0, 110, 0);
+      white_square_color = color(255, 255, 255);
+      square_selected_color = color(243, 255, 0);
+    }
+    if (GameType == "3D Chess") {
+      board_side = 100;
+      board_x = int((screen_width/2) - (board_side/2));
+      board_y = int(screen_height / 10);
+      square_side = board_side / 8;
+      black_square_color = color(0, 110, 0);
+      white_square_color = color(255, 255, 255);
+      square_selected_color = color(243, 255, 0);
+    }
   }
 }
 
@@ -261,7 +284,7 @@ class Piece {
     int i = destination_square_index; //renaming it to be shorter
     
     //I think these are making copies of the objects...I'm not sure though.
-    Square destination_square = Chess.Board.Squares[i];
+    Square destination_square = Chess.Boards[0].Squares[i];
     Square selected_square = Chess.selected_square;
     Piece null_piece = Chess.null_piece;
     

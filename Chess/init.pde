@@ -48,7 +48,7 @@ void InitializePieces () {
 } //end of InitializePieces()  
 
 void InitializeSquares () {
-  Chess.Board.Squares = new Square[64];
+  Chess.Boards[0].Squares = new Square[64];
   float square_x;
   float square_y;
   color default_square_color;
@@ -67,25 +67,25 @@ void InitializeSquares () {
       //range: 0,0 to 8,8 starting from the top left of the board
       board_location = new int[] {col, row};
       //determining the square's screen location (ie the pixel coordinates)
-      square_x = Chess.Board.board_x + (col * Chess.Board.square_side);
-      square_y = Chess.Board.board_y + (row * Chess.Board.square_side);
+      square_x = Chess.Boards[0].board_x + (col * Chess.Boards[0].square_side);
+      square_y = Chess.Boards[0].board_y + (row * Chess.Boards[0].square_side);
       screen_location = new float[] {square_x, square_y};
       //determining the square's color
       if (row % 2 == 0) {
         if (col % 2 == 0) {
-          default_square_color = Chess.Board.white_square_color;
+          default_square_color = Chess.Boards[0].white_square_color;
         } else {
-          default_square_color = Chess.Board.black_square_color;
+          default_square_color = Chess.Boards[0].black_square_color;
         }
       } else {
         if (col % 2 == 0) {
-          default_square_color = Chess.Board.black_square_color;
+          default_square_color = Chess.Boards[0].black_square_color;
         } else {
-          default_square_color = Chess.Board.white_square_color;
+          default_square_color = Chess.Boards[0].white_square_color;
         }
       }
       //after gathering all the necessary info, we can now initialize the square
-      Chess.Board.Squares[index_num] = new Square(name, board_location, 
+      Chess.Boards[0].Squares[index_num] = new Square(name, board_location, 
                                                   screen_location,
                                                   default_square_color);
     } //end of the column loop
@@ -94,7 +94,7 @@ void InitializeSquares () {
   //this matches up the squares with whatever pieces are occupying it
   Piece[] Pieces = Chess.Pieces;
   for (int p = 0; p < Pieces.length; p++) {
-    Square[] Squares = Chess.Board.Squares;
+    Square[] Squares = Chess.Boards[0].Squares;
     for (int s = 0; s < Squares.length; s++) {
       if (Pieces[p].board_location[0] == Squares[s].board_location[0] &&
           Pieces[p].board_location[1] == Squares[s].board_location[1]) {
