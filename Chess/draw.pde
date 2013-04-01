@@ -1,11 +1,4 @@
 void DrawChessboard() {
-
-  //creating the squares on the chessboard.  I loop through
-  //the rows and columns and ask whether it's an even row/col to
-  //figure out if I need to color it green or white.
-  //I'm defining square_x/y here instead of within the for-loops so that I
-  //don't have the computer recreating the variables 64 times every time it
-  //draws the chessboard.
   Square[] Squares = Chess.Boards[0].Squares;
   for (int i = 0; i < Squares.length; i++) {
     if (Squares[i].selected == true) {
@@ -17,7 +10,6 @@ void DrawChessboard() {
     } else {
       fill(Squares[i].current_square_color);
     }
-    
     if (Squares[i].hovered_over == true) {
       stroke(255, 0, 0);
     } else {
@@ -29,68 +21,59 @@ void DrawChessboard() {
   }
 } //end of DrawChessboard()
 
-//I want this function to make the selected square glow slowly brighter and
-//darker to make the board more attractive.  Maybe I could make many squares
-//glow, and have them glow at different rates based on information about that
-//square (eg a piece in danger glows quickly).
+float getColorChannel(color c, int channel) {
+  if (channel == 0) {
+    return red(c);
+  } else if (channel == 1) {
+    return green(c);
+  } else {
+    return blue(c);
+  }
+}
+
+color insertIntoColor(color c, int channel, float insertion) {
+  if (channel == 0) {
+    return color(insertion, green(c), blue(c));
+  } else if (channel == 1) {
+    return color(red(c), insertion, blue(c));
+  } else {
+    return color(red(c), green(c), insertion);
+  }
+}
+
 color alternateColors(color start_color, color dest_color, 
-                      int period_in_seconds, 
+                      int period_in_seconds,
                       int target_frameRate) {
-  //calculate how many frames a complete cycle of glowing will take, going
-  //all the way from the start_color to the dest_color and then back.
-  //I can't use the system variable frameRate because it may change if the comp
-  //can't calculate fast enough to hit the target framerate.
   float glow_period_in_frames = int(target_frameRate * period_in_seconds);
   float current_position_in_the_period = frameCount % glow_period_in_frames;
-
-  //calculate the total distance we need to travel from one color to the other
-  int total_red_change = int(red(dest_color)) - int(red(start_color));
-  int total_green_change = int(green(dest_color)) - int(green(start_color));
-  int total_blue_change = int(blue(dest_color)) - int(blue(start_color));
-
-  //calculate how much each color channel needs to be adjusted from the
-  //starting color.
-  float red_adjustment;
-  float green_adjustment;
-  float blue_adjustment;
-  if (current_position_in_the_period < (glow_period_in_frames / 2)) {
+  color updated_color = color(0,0,0);
+  for (int chnl=0; chnl<=2; ++chnl) { //loop through updated_color
+    int channel_start = int(getColorChannel(start_color, chnl));
+    int channel_dest = int(getColorChannel(dest_color, chnl));
+    int total_change = channel_dest - channel_start;
+    float adjustment;
     float fraction_complete = current_position_in_the_period /
-    glow_period_in_frames;
-    float first_half_adjustment = fraction_complete * 2;
-
-    red_adjustment = total_red_change * first_half_adjustment;
-    green_adjustment = total_green_change * first_half_adjustment;
-    blue_adjustment = total_blue_change * first_half_adjustment;
-  } 
-  else {
-    float fraction_complete = current_position_in_the_period /
-    glow_period_in_frames;
-    float second_half_adjustment = ((-2 * fraction_complete) + 2);
-
-    red_adjustment = total_red_change * second_half_adjustment;
-    green_adjustment = total_green_change * second_half_adjustment;
-    blue_adjustment = total_blue_change * second_half_adjustment;
+                              glow_period_in_frames;
+    if (current_position_in_the_period < (glow_period_in_frames / 2)) {
+      float first_half_adjustment = fraction_complete * 2;
+      adjustment = total_change * first_half_adjustment;
+    } else {
+      float second_half_adjustment = ((-2 * fraction_complete) + 2);
+      adjustment = total_change * second_half_adjustment;
+    }
+    float updated_channel = channel_start + adjustment;
+    updated_color = insertIntoColor(updated_color, chnl, updated_channel);
   }
-
-  //to make sure I make the right decision about adding or subracting the nec.
-  //change in value, I need to check whether I am [currently moving from the
-  //starting color to the destination color] or if it's vice versa.
-  float new_red = red(start_color) + (red_adjustment);
-  float new_green = green(start_color) + (green_adjustment);
-  float new_blue = blue(start_color) + (blue_adjustment);
-
-  return color(new_red, new_green, new_blue);
+  return updated_color;
 }
 
 void DrawPieces() {
   Piece[] Pieces = Chess.Pieces;
-  //loading this font closer to where I use it lags the program
   PFont ArialBold = loadFont("Arial-BoldMT-10.vlw");
   for (Piece i : Pieces) {
     if (i.side == 'W') {
       fill(Chess.white_player_color);
-    } 
-    else {
+    } else {
       fill(Chess.black_player_color);
     }
     noStroke();
@@ -98,16 +81,15 @@ void DrawPieces() {
     float board_side = Chess.Boards[0].board_side;
     float square_side = Chess.Boards[0].square_side;
     float piece_x = board_x + ((board_side / 8) * (i.board_location[0])) + 
-      (square_side / 3);
+                    (square_side / 3);
     float board_y = Chess.Boards[0].board_y;
     float piece_y = board_y + ((board_side / 8) * (i.board_location[1] + 1)) -
-      (square_side / 3);
+                    (square_side / 3);
     ellipse(piece_x + 7, piece_y - 5, 20, 20);
     fill(0, 0, 0);
     char piece_type = i.type;
     textFont(ArialBold,16);
     text(piece_type, piece_x, piece_y);
-    //image(img, piece_x, piece_y, img.width, img.height);
   }
 } //end of DrawPieces()
 
