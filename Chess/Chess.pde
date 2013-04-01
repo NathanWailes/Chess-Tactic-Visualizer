@@ -1,24 +1,12 @@
 //*********************THIS LINE IS 80 CHARACTERS LONG**************************
-
 PImage img;
-
-//I need global screen_width/height vars b/c the Board class uses the width and
-//height of the screen to set the x/y pos of the board.  And the Board class is
-//initialized BEFORE the size() function sets the width/height.  The original
-//width/height I used was 640x360
+//I need screen_width/height to initialize the board size
 int screen_width = 1280;
 int screen_height = 640;
-
-//I need this to be global b/c I need to access the stuff formed here both in
-//the setup() and draw() functions.
+//I need Chess global to access its stuff across multiple frames
 ChessGame Chess = new ChessGame("2D Chess");
-
-//I need this global variable for alternateColors() to have glowing happen over
-//a constant amount of time even if I decide to change the framerate later.
-int target_frameRate = 30;
-
+int target_frameRate = 30; //alternateColors() needs target_frameRate
 String CurrentScreen = "Menu";
-
 
 void setup() {
   size(screen_width, screen_height);
@@ -31,37 +19,16 @@ void draw() {
     DrawMenu();
   } else if (CurrentScreen == "In Game") {
     background(0);
-    update(mouseX, mouseY);
+    Chess.updateMouseHover(mouseX, mouseY);
     DrawChessboard();
     DrawPieces();
-  }
-} //end of draw() function
-
-void update(int x, int y) {
-  Square[] Squares = Chess.Boards[0].Squares;
-  for (int i=0; i < Squares.length; i++) {
-    float square_side = Chess.Boards[0].square_side;
-    if ( overRect(Squares[i].screen_location[0], 
-         Squares[i].screen_location[1],
-         square_side, square_side) ) {
-      Squares[i].hovered_over = true;
-    } else {
-      Squares[i].hovered_over = false;
-    }
-  }
-}
-boolean overRect(float x, float y, float width, float height) {
-  if (mouseX >= x && mouseX <= x+width && 
-      mouseY >= y && mouseY <= y+height) {
-    return true;
-  } else {
-    return false;
   }
 }
 
 void mousePressed() {
-  //check if any squares were clicked on, and if so, take appropriate action
-  if (Chess.Boards[0].Squares != null) {
+  if (CurrentScreen == "Menu") {
+    //Menu.ProcessClick();
+  } else if (CurrentScreen == "In Game") {
     Chess.ProcessSquareClick();
   }
 }
@@ -69,11 +36,9 @@ void mousePressed() {
 void keyPressed() {
   if (key=='1'){
     CurrentScreen = "Menu";
-  }
-  if (key=='2' && (Chess.Boards[0].Squares != null)){
+  } else if (key=='2' && (Chess.Boards[0].Squares != null)){
     CurrentScreen = "In Game";
-  }
-  if (key=='3'){
+  } else if (key=='3'){
     Chess.New2DGame();
     CurrentScreen = "In Game";
   }
