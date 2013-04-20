@@ -11,6 +11,8 @@ class ChessGame {
   // an array of type Piece; the array's named Pieces
   Piece[] Pieces;
   
+  char player_to_move = 'W';
+  
   color white_player_color = color(0, 0, 150);
   color black_player_color = color(150, 0, 0);
   
@@ -46,6 +48,14 @@ class ChessGame {
     }
   }
   
+  void SwitchTurns() {
+    if (player_to_move == 'W') {
+      player_to_move = 'B';
+    } else {
+      player_to_move = 'W';
+    }
+  }
+  
   void ProcessSquareClick() {
     Square[] Squares = Boards[0].Squares; //making a shorter name for Boards[0].Squares
     for (int i=0; i < Squares.length; i++) {
@@ -62,11 +72,18 @@ class ChessGame {
                    (Squares[i].selected == false)) {
           selected_square = Squares[i];
           Squares[i].selected = true;
+        //if a piece is selected and it isn't that side's turn to move,
+        //don't do anything.
+        } else if ((selected_square.occupying_piece != null_piece) &&
+                   (Chess.player_to_move != selected_square.occupying_piece.side)){
+          return;
         //if a piece is selected already, move it to the current square
         } else if ((selected_square.occupying_piece != null_piece) /*&& 
                    (Squares[i].occupying_piece.MoveAllowed(Squares[i]))*/
                    ) {
           selected_square.occupying_piece.Move(i);
+          //switch whose turn it is
+          Chess.SwitchTurns();
         }
       }
     }

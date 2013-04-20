@@ -33,8 +33,12 @@ class Piece {
         occupying_piece = Chess.Pieces[i];
       }
     }
+    
+    //check if the player is trying to move to a square he already controls
     if (destination_square.occupying_piece.side == this.side) {
       return false;
+      
+    //check if the desired move is a legal move within the game
     } else if (this.type == 'P') {
       return Chess.LegalPawnMove(this, destination_square, Chess.Pieces)
              ? true : false;
@@ -71,11 +75,10 @@ class Piece {
                                               destination_square.board_location;
       destination_square.occupying_piece = selected_square.occupying_piece;
       selected_square.occupying_piece = null_piece;
-    //if there's an opponent's piece there already, then
+    } else {
+      //if there's an opponent's piece there already, then
       //remove the opponent's piece, set it to "captured"
       //move the selected piece to that square
-    } else {
-      
     }
     //deselect the selected square automatically
     Chess.selected_square.selected = false;
